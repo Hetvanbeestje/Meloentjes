@@ -1,0 +1,32 @@
+const { Command } = require('discord.js-commando');
+
+module.exports = class LeaveCommand extends Command {
+  constructor(client) {
+    super(client, {
+      name: 'leave',
+      aliases: ['end', 'stop'],
+      group: 'music',
+      memberName: 'leave',
+      guildOnly: true,
+      description: 'Verlaat de Voicecall. '
+    });
+  }
+
+  run(message) {
+    if (message.author.bot) return;
+    var voiceChannel = message.member.voice.channel;
+    if (!voiceChannel) return message.reply('Join een voicecall en probeer het opnieuw.');
+
+    if (
+      typeof message.guild.musicData.songDispatcher == 'undefined' ||
+      message.guild.musicData.songDispatcher == null
+    ) {
+      return message.reply('Op dit moment wordt er geen nummer gedraaid!');
+    }
+    if (!message.guild.musicData.queue)
+      return message.say('There are no songs in queue');
+    message.guild.musicData.songDispatcher.end();
+    message.guild.musicData.queue.length = 0;
+    return;
+  }
+};

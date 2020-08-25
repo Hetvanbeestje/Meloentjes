@@ -1,0 +1,33 @@
+
+const { Command } = require("discord.js-commando");
+const { MessageEmbed } = require("discord.js");
+
+module.exports = class QueueCommand extends Command {
+  constructor(client) {
+    super(client, {
+      name: "queue",
+      aliases: ["song-list", "next-songs"],
+      group: "music",
+      memberName: "queue",
+      guildOnly: true,
+      description: "Laat de lijst zien, met welke nummers er nog gedraaid gaan worden."
+    });
+  }
+
+  run(message) {
+    if (message.author.bot) return;
+    if (message.guild.musicData.queue.length == 0)
+      return message.say("Er staat geen 1 nummer in de queue!");
+    const titleArray = [];
+    message.guild.musicData.queue.map(obj => {
+      titleArray.push(obj.title);
+    });
+    var queueEmbed = new MessageEmbed()
+      .setColor("AQUA")
+      .setTitle("Music Queue");
+    for (let i = 0; i < titleArray.length; i++) {
+      queueEmbed.addField(`${i + 1}:`, `${titleArray[i]}`);
+    }
+    return message.say(queueEmbed);
+  }
+};

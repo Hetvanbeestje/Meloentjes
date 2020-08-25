@@ -1,0 +1,29 @@
+
+const { Command } = require('discord.js-commando');
+
+module.exports = class SkipCommand extends Command {
+  constructor(client) {
+    super(client, {
+      name: 'skip',
+      aliases: ['skip-song', 'advance-song'],
+      memberName: 'skip',
+      group: 'music',
+      description: 'Skip het nummer dat nu gedraaid wordt',
+      guildOnly: true
+    });
+  }
+
+  run(message) {
+    if (message.author.bot) return;
+    const voiceChannel = message.member.voice.channel;
+    if (!voiceChannel) return message.reply('Join een voicecall en probeer het opnieuw!');
+
+    if (
+      typeof message.guild.musicData.songDispatcher == 'undefined' ||
+      message.guild.musicData.songDispatcher == null
+    ) {
+      return message.reply('Er wordt nu geen nummer gedraaid!');
+    }
+    message.guild.musicData.songDispatcher.end();
+  }
+};

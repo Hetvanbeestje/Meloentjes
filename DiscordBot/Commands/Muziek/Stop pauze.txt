@@ -1,0 +1,30 @@
+const { Command } = require('discord.js-commando');
+
+module.exports = class ResumeCommand extends Command {
+  constructor(client) {
+    super(client, {
+      name: 'unpause',
+      aliases: ['resume'],
+      memberName: 'resume',
+      group: 'music',
+      description: 'Stopt de pauze van een nummer.',
+      guildOnly: true
+    });
+  }
+
+  run(message) {
+    var voiceChannel = message.member.voice.channel;
+    if (!voiceChannel) return message.reply('Join een Voicecall en probeer opnieuw.');
+
+    if (
+      typeof message.guild.musicData.songDispatcher == 'undefined' ||
+      message.guild.musicData.songDispatcher === null
+    ) {
+      return message.reply('Er draait op dit moment geen nummer!');
+    }
+
+    message.say('Unpaused :play_pause:');
+
+    message.guild.musicData.songDispatcher.resume();
+  }
+};

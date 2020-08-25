@@ -1,0 +1,141 @@
+var Discord = require('discord.io');
+var logger = require('winston');
+var auth = require('./auth.json');
+// Configure logger settings
+logger.remove(logger.transports.Console);
+logger.add(new logger.transports.Console, {
+    colorize: true
+});
+logger.level = 'debug';
+// Initialize Discord Bot
+var bot = new Discord.Client({
+   token: auth.token,
+   autorun: true
+});
+bot.on('ready', function (evt) {
+    logger.info('Connected');
+    logger.info('Logged in as: ');
+    logger.info(bot.username + ' - (' + bot.id + ')');
+});
+bot.on('message', function (user, userID, channelID, message, evt) {
+    // Our bot needs to know if it will execute a command
+    // It will listen for messages that will start with `!`
+    if (message.substring(0, 1) == '!') {
+        var args = message.substring(1).split(' ');
+        var cmd = args[0];
+       
+        args = args.splice(1);
+        switch(cmd) {
+            // !ping
+            case 'ping':
+                bot.sendMessage({
+                    to: channelID,
+                    message: 'Pong!'
+                });
+            break;
+            // Just add any case commands if you want to..
+         }
+     }
+});
+
+@Override
+protected void execute(CommandEvent commandEvent) {
+    Guild guild = commandEvent.getGuild();
+    //if we're not in a guild we can't kick anyone
+    if(guild == null) {
+        commandEvent.reply("You must run this command in a server");
+        return;
+    }
+    Member author = commandEvent.getMessage().getMember();
+    //the author can't kick people
+    if(!author.hasPermission(Permission.KICK_MEMBERS)) {
+        commandEvent.reply("You don't have permission to kick people!");
+        return;
+    }
+    List&lt;Member&gt; mentionedMembers = commandEvent.getMessage().getMentionedMembers();
+    if(mentionedMembers.isEmpty()) {
+        commandEvent.reply("You must mention who you want to be kicked");
+        return;
+    }
+    guild.getController().kick(mentionedMembers.get(0)).queue(success-&gt;{
+        commandEvent.reply("Successfully kicked " + mentionedMembers.get(0).getUser().getName());
+    }, error-&gt;{
+        commandEvent.reply("Unable to kick " + mentionedMembers.get(0).getUser().getName() + ": " + error);
+    });
+
+const args = message.content.split(' ').slice(1); // All arguments behind the command name with the prefix
+​
+const user = message.mentions.users.first(); // returns the user object if an user mention exists
+const banReason = args.slice(1).join(' '); // Reason of the ban (Everything behind the mention)
+​
+// Check if an user mention exists in this message
+if (!user) {
+try {
+// Check if a valid userID has been entered instead of a Discord user mention
+if (!message.guild.members.get(args.slice(0, 1).join(' '))) throw new Error('Couldn\' get a Discord user with this userID!');
+// If the client (bot) can get a user with this userID, it overwrites the current user variable to the user object that the client fetched
+user = message.guild.members.get(args.slice(0, 1).join(' '));
+user = user.user;
+} catch (error) {
+return message.reply('Couldn\' get a Discord user with this userID!');
+}
+}
+if (user === message.author) return message.channel.send('You can\'t ban yourself'); // Check if the user mention or the entered userID is the message author himsmelf
+if (!reason) return message.reply('You forgot to enter a reason for this ban!'); // Check if a reason has been given by the message author
+if (!message.guild.member(user).bannable) return message.reply('You can\'t ban this user because you the bot has not sufficient permissions!'); // Check if the user is bannable with the bot's permissions
+​
+await message.guild.ban(user) // Bans the user
+​
+const Discord = require('discord.js'); // We need Discord for our next RichEmbeds
+const banConfirmationEmbed = new Discord.RichEmbed()
+.setColor('RED')
+.setDescription(`✅ ${user.tag} has been successfully banned!`);
+message.channel.send({
+embed: banConfirmationEmbed
+}); // Sends a confirmation embed that the user has been successfully banned
+​
+​
+const modlogChannelID = ''; // Discord channel ID where you want to have logged the details about the ban
+if (modlogChannelID.length !== 0) {
+if (!client.channels.get(modlogChannelID )) return undefined; // Check if the modlogChannelID is a real Discord server channel that really exists
+​
+const banConfirmationEmbedModlog = new Discord.RichEmbed()
+.setAuthor(`Banned by **${msg.author.username}#${msg.author.discriminator}**`, msg.author.displayAvatarURL)
+.setThumbnail(user.displayAvatarURL)
+.setColor('RED')
+.setTimestamp()
+.setDescription(`**Action**: Ban
+**User**: ${user.username}#${user.discriminator} (${user.id})
+**Reason**: ${reason}`);
+client.channels.get(modlogChannelID).send({
+embed: banConfirmationEmbedModlog
+}); // Sends the RichEmbed in the modlogchannel
+}
+Guild guild = ...
+GuildController controller = guild.getController();
+List&lt;Member&gt; mentionedMembers = commandEvent.getMessage().getMentionedMembers();
+if(mentionedMembers.isEmpty()) {
+    commandEvent.reply("You must mention who you want to be kicked");
+    return;
+}
+Member toMute = mentionedMembers.get(0);
+Role muteRole = guild.getRoles().stream().filter(r-&gt;r.getName().equals("Muted")).findFirst().orElse(null);
+if(muteRole == null) {
+    commandEvent.reply("No role named 'Muted' found");
+    return;
+}
+controller.addSingleRoleToMember(toMute, muteRole).queue(success-&gt;{
+    commandEvent.reply("Successfully muted " + toMute.getUser().getName());
+}, error-&gt;{
+    commandEvent.reply("Unable to mute " + toMute.getUser().getName() + ": " + error);
+});
+controller.addSingleRoleToMember(toMute, muteRole).queue(success-&gt;{
+    commandEvent.reply("Successfully muted " + toMute.getUser().getName());
+    controller.removeSingleRoleFromMember(toMute, muteRole).queueAfter(1, TimeUnit.HOURS, success2-&gt;{
+        commandEvent.reply("Successfully unmuted " + toMute.getUser().getName());
+    }, error-&gt;{
+        commandEvent.reply("Unable to unmute " + toMute.getUser().getName() + ": " + error);
+    });
+}, error-&gt;{
+    commandEvent.reply("Unable to mute " + toMute.getUser().getName() + ": " + error);
+});

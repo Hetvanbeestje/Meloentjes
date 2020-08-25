@@ -1,0 +1,8 @@
+{
+“name”: “Meloentjes Bot”,
+“version”: “1.0.0”,
+“description”: “MeloentjesBot is een moderatie bot!”,
+“main”: “bot.js”,
+“author”: “ChrisjeVisje”,
+“dependencies”: {}
+}
